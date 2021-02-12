@@ -6,25 +6,32 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import dataAccessLayer.DataAccessLayer;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import model.Allocation;
+import model.Allocation.AllocationTypeTypeEnum;
 import model.AssetClass;
-import model.AssetClass.AssetClassTypeEnum;
+import model.AssetClassAllocationWrapper;
 import model.Scenario;
 
 public class ScenarioController implements Initializable {
 	private DataAccessLayer data;
 	private Scene mainScene;
 	private Scenario scenario;
+	private	ObservableList<AssetClass> assetClassList = FXCollections.observableArrayList();
+ 
 
 	public Scenario getScenario() {
 		return scenario;
@@ -46,7 +53,14 @@ public class ScenarioController implements Initializable {
 		this.mainScene = mainScene;
 	}
 
-    @FXML  
+    public ObservableList<AssetClass> getAssetClassList() {
+		return assetClassList;
+	}
+	public void setAssetClassList(ObservableList<AssetClass> assetClassList) {
+		this.assetClassList = assetClassList;
+	}
+
+	@FXML  
     private Button clearInitialAllocationsButton;
 
     @FXML  
@@ -56,7 +70,8 @@ public class ScenarioController implements Initializable {
     private Button addInitialAllocationButton;
 
     @FXML  
-    private TextField initialAssetNameField;
+    private ComboBox<AssetClass> initialAssetNameBox;
+
 
     @FXML  
     private TextField initialAssetRateOfReturnField;
@@ -65,16 +80,16 @@ public class ScenarioController implements Initializable {
     private TextField initialAssetAllocationField;
 
     @FXML  
-    private TableView<AssetClass> initialAllocationTable;
+    private TableView<AssetClassAllocationWrapper> initialAllocationTable;
 
     @FXML  
-    private TableColumn<AssetClass, String> initialAllocationNameColumn;
+    private TableColumn<AssetClassAllocationWrapper, String> initialAllocationNameColumn;
 
     @FXML  
-    private TableColumn<AssetClass, Double> initialAllocationRateOfReturnColumn;
+    private TableColumn<AssetClassAllocationWrapper, Double> initialAllocationRateOfReturnColumn;
 
     @FXML  
-    private TableColumn<AssetClass, Double> initialAllocationColumn;
+    private TableColumn<AssetClassAllocationWrapper, Double> initialAllocationColumn;
 
     @FXML 
     private Label assetLabel;
@@ -104,7 +119,7 @@ public class ScenarioController implements Initializable {
     private Button addExpectedAllocationButton;
 
     @FXML  
-    private TextField expectedAssetNameField;
+    private ComboBox<AssetClass> expectedAssetNameBox;
 
     @FXML  
     private TextField expectedAssetRateOfReturnField;
@@ -113,30 +128,32 @@ public class ScenarioController implements Initializable {
     private TextField expectedAssetAllocationField;
 
     @FXML  
-    private TableView<AssetClass> expectedAllocationTable;
+    private TableView<AssetClassAllocationWrapper> expectedAllocationTable;
 
     @FXML  
-    private TableColumn<AssetClass, String> expectedAllocationNameColumn;
+    private TableColumn<AssetClassAllocationWrapper, String> expectedAllocationNameColumn;
 
     @FXML  
-    private TableColumn<AssetClass, Double> expectedAllocationRateOfReturnColumn;
+    private TableColumn<AssetClassAllocationWrapper, Double> expectedAllocationRateOfReturnColumn;
 
     @FXML  
-    private TableColumn<AssetClass, Double> expectedAllocationColumn;
+    private TableColumn<AssetClassAllocationWrapper, Double> expectedAllocationColumn;
     
     @FXML  
     private Button goBackButton;
 
     @FXML  
     void addExpectedAllocation(ActionEvent event) {
-    	String assetClassName = expectedAssetNameField.getText();
+    	String assetClassName = expectedAssetNameBox.getSelectionModel().toString();
 		double rateOfReturn = Double.parseDouble(expectedAssetRateOfReturnField.getText());
-		double allocation = Double.parseDouble(expectedAssetAllocationField.getText());
+		double allocationRate = Double.parseDouble(expectedAssetAllocationField.getText());
 		try {
 			data.addAssetClass(assetClassName, rateOfReturn);
-			scenario.getExpectedAllocationList().add(new AssetClass(assetClassName, rateOfReturn, allocation,
-					AssetClassTypeEnum.EXPECTED_ASSET, scenario.getScenarioNumber()));
-			expectedAssetNameField.clear();
+			data.linkAssetToScenario(assetClassName, scenario.getScenarioNumber(), allocationRate, false);
+			AssetClass assetClass = new AssetClass(assetClassName, rateOfReturn);
+			Allocation allocation = new Allocation(allocationRate, AllocationTypeTypeEnum.EXPECTED_ASSET, scenario.getScenarioNumber(), assetClassName);
+			scenario.getExpectedAllocationList().add(new AssetClassAllocationWrapper(assetClass, allocation));
+			expectedAssetNameBox.getSelectionModel().clearSelection();
 			expectedAssetRateOfReturnField.clear();
 			expectedAssetAllocationField.clear();
 		} catch (SQLException e) {
@@ -147,15 +164,16 @@ public class ScenarioController implements Initializable {
 
     @FXML  
     void addInitialAllocation(ActionEvent event) {
-    	String assetClassName = initialAssetNameField.getText();
+    	String assetClassName = initialAssetNameBox.getSelectionModel().toString();
 		double rateOfReturn = Double.parseDouble(initialAssetRateOfReturnField.getText());
-		double allocation = Double.parseDouble(initialAssetAllocationField.getText());
+		double allocationRate = Double.parseDouble(initialAssetAllocationField.getText());
 		try {
 			data.addAssetClass(assetClassName, rateOfReturn);
-			data.linkAssetToScenario(assetClassName, scenario.getScenarioNumber(), allocation, true);
-			scenario.getInitialAllocationList().add(new AssetClass(assetClassName, rateOfReturn, allocation,
-					AssetClassTypeEnum.INITIAL_ASSET, scenario.getScenarioNumber()));
-			initialAssetNameField.clear();
+			data.linkAssetToScenario(assetClassName, scenario.getScenarioNumber(), allocationRate, false);
+			AssetClass assetClass = new AssetClass(assetClassName, rateOfReturn);
+			Allocation allocation = new Allocation(allocationRate, AllocationTypeTypeEnum.INITIAL_ASSET, scenario.getScenarioNumber(), assetClassName);
+			scenario.getExpectedAllocationList().add(new AssetClassAllocationWrapper(assetClass, allocation));
+			initialAssetNameBox.getSelectionModel().clearSelection();
 			initialAssetRateOfReturnField.clear();
 			initialAssetAllocationField.clear();
 		} catch (SQLException e) {
@@ -185,10 +203,20 @@ public class ScenarioController implements Initializable {
     }
     @FXML  
     void goBack(ActionEvent event) {
-    	Stage stage = (Stage) initialAssetNameField.getScene().getWindow();
+    	Stage stage = (Stage) expectedAssetRateOfReturnField.getScene().getWindow();
 
 		stage.setScene(mainScene);
 		stage.show();
+    }
+    
+    @FXML
+    void expectedAssetSelected(ActionEvent event) {
+    	this.updateTextFieldsOnSelectedAsset(expectedAssetNameBox, expectedAssetRateOfReturnField);
+    }
+
+    @FXML
+    void initialAssetSelected(ActionEvent event) {
+    	this.updateTextFieldsOnSelectedAsset(initialAssetNameBox, initialAssetRateOfReturnField);
     }
     
     public void updateLabelsWithScenario() {
@@ -207,18 +235,23 @@ public class ScenarioController implements Initializable {
     }
 
 	public void updateInitialAllocationTable() {
-		initialAllocationNameColumn.setCellValueFactory(new PropertyValueFactory<AssetClass, String>("assetClassName"));
-		initialAllocationRateOfReturnColumn.setCellValueFactory(new PropertyValueFactory<AssetClass, Double>("rateOfReturn"));
-		initialAllocationColumn.setCellValueFactory(new PropertyValueFactory<AssetClass, Double>("allocation"));
+		initialAllocationNameColumn.setCellValueFactory(new PropertyValueFactory<AssetClassAllocationWrapper, String>("assetClassName"));
+		initialAllocationRateOfReturnColumn.setCellValueFactory(new PropertyValueFactory<AssetClassAllocationWrapper, Double>("rateOfReturn"));
+		initialAllocationColumn.setCellValueFactory(new PropertyValueFactory<AssetClassAllocationWrapper, Double>("allocationRate"));
 		getInitialAssetClasses();
 		initialAllocationTable.setItems(scenario.getInitialAllocationList());
 	}
 	public void updateExpectedAllocationTable() {
-		expectedAllocationNameColumn.setCellValueFactory(new PropertyValueFactory<AssetClass, String>("assetClassName"));
-		expectedAllocationRateOfReturnColumn.setCellValueFactory(new PropertyValueFactory<AssetClass, Double>("rateOfReturn"));
-		expectedAllocationColumn.setCellValueFactory(new PropertyValueFactory<AssetClass, Double>("allocation"));
+		expectedAllocationNameColumn.setCellValueFactory(new PropertyValueFactory<AssetClassAllocationWrapper, String>("assetClassName"));
+		expectedAllocationRateOfReturnColumn.setCellValueFactory(new PropertyValueFactory<AssetClassAllocationWrapper, Double>("rateOfReturn"));
+		expectedAllocationColumn.setCellValueFactory(new PropertyValueFactory<AssetClassAllocationWrapper, Double>("allocationRate"));
 		getExpectedAssetClasses();
 		initialAllocationTable.setItems(scenario.getExpectedAllocationList());
+	}
+	public void updateAssetComboBoxes() {
+		getAssetClasses();
+		initialAssetNameBox.setItems(assetClassList);
+		expectedAssetNameBox.setItems(assetClassList);
 	}
 
 	/********************
@@ -235,10 +268,12 @@ public class ScenarioController implements Initializable {
 				while (initialAssetSet.next()) {
 					String assetClassName = initialAssetSet.getString("assetClassName");
 					double rateOfReturn = initialAssetSet.getDouble("rateOfReturn");
-					double allocation = initialAssetSet.getDouble("allocation");
-
-					AssetClass thisRow = new AssetClass(assetClassName, rateOfReturn, allocation,
-							AssetClassTypeEnum.INITIAL_ASSET, scenario.getScenarioNumber());
+					double allocationRate = initialAssetSet.getDouble("allocation");
+					
+					AssetClass assetClass = new AssetClass(assetClassName, rateOfReturn);
+					Allocation allocation = new Allocation(allocationRate, AllocationTypeTypeEnum.INITIAL_ASSET, scenario.getScenarioNumber(), assetClassName);
+					
+					AssetClassAllocationWrapper thisRow = new AssetClassAllocationWrapper(assetClass, allocation);
 					scenario.getInitialAllocationList().add(thisRow);
 				}
 				data.closeConnection();
@@ -265,10 +300,12 @@ public class ScenarioController implements Initializable {
 				while (expectedAssetSet.next()) {
 					String assetClassName = expectedAssetSet.getString("assetClassName");
 					double rateOfReturn = expectedAssetSet.getDouble("rateOfReturn");
-					double allocation = expectedAssetSet.getDouble("allocation");
+					double allocationRate = expectedAssetSet.getDouble("allocation");
 
-					AssetClass thisRow = new AssetClass(assetClassName, rateOfReturn, allocation,
-							AssetClassTypeEnum.EXPECTED_ASSET, scenario.getScenarioNumber());
+					AssetClass assetClass = new AssetClass(assetClassName, rateOfReturn);
+					Allocation allocation = new Allocation(allocationRate, AllocationTypeTypeEnum.EXPECTED_ASSET, scenario.getScenarioNumber(), assetClassName);
+					
+					AssetClassAllocationWrapper thisRow = new AssetClassAllocationWrapper(assetClass, allocation);
 					scenario.getExpectedAllocationList().add(thisRow);
 				}
 				data.closeConnection();
@@ -279,6 +316,44 @@ public class ScenarioController implements Initializable {
 			}
 		}
 	}
+	/********************
+	 * Function			getAssetClasses
+	 * Description		Method to get all expected assets from the current scenario in the database.
+	 * 					Does not run if DB query has been run more than once.
+	 * Parameters 		
+	 * Returns			
+	 ********************/
+	public void getAssetClasses() {
+		if (assetClassList.isEmpty()) {
+			try {
+				ResultSet assetSet = data.getAssetClasses();
+				while (assetSet.next()) {
+					String assetClassName = assetSet.getString("assetClassName");
+					double rateOfReturn = assetSet.getDouble("rateOfReturn");
+
+					AssetClass assetClass = new AssetClass(assetClassName, rateOfReturn);
+					
+					assetClassList.add(assetClass);
+				}
+				data.closeConnection();
+
+			} catch (ClassNotFoundException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	public void updateTextFieldsOnSelectedAsset(ComboBox<AssetClass> assetBox, TextField rateOfReturnField) {
+		try {
+			AssetClass selectedAsset = assetBox.getSelectionModel().getSelectedItem();
+			rateOfReturnField.setText("" + selectedAsset.getRateOfReturn());
+		}
+		catch (ClassCastException e) {
+			rateOfReturnField.setText("");
+		}
+	}
+	
+	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		
@@ -287,6 +362,7 @@ public class ScenarioController implements Initializable {
 		this.updateExpectedAllocationTable();
 		this.updateInitialAllocationTable();
 		this.updateLabelsWithScenario();
+		this.updateAssetComboBoxes();
 	}
 }
 

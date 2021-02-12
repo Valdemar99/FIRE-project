@@ -18,19 +18,19 @@ public class Scenario {
 	private StringProperty scenarioName;
 	private DoubleProperty amountOfTerms;
 	private DoubleProperty paymentPerTerm;
-	private ObservableList<AssetClass> initialAllocationList;
-	private ObservableList<AssetClass> expectedAllocationList;
+	private ObservableList<AssetClassAllocationWrapper> initialAllocationList;
+	private ObservableList<AssetClassAllocationWrapper> expectedAllocationList;
 	
-	public ObservableList<AssetClass> getInitialAllocationList() {
+	public ObservableList<AssetClassAllocationWrapper> getInitialAllocationList() {
 		return initialAllocationList;
 	}
-	public void setInitialAllocationList(ObservableList<AssetClass> initialAllocationList) {
+	public void setInitialAllocationList(ObservableList<AssetClassAllocationWrapper> initialAllocationList) {
 		this.initialAllocationList = initialAllocationList;
 	}
-	public ObservableList<AssetClass> getExpectedAllocationList() {
+	public ObservableList<AssetClassAllocationWrapper> getExpectedAllocationList() {
 		return expectedAllocationList;
 	}
-	public void setExpectedAllocationList(ObservableList<AssetClass> expectedAllocationList) {
+	public void setExpectedAllocationList(ObservableList<AssetClassAllocationWrapper> expectedAllocationList) {
 		this.expectedAllocationList = expectedAllocationList;
 	}
 	public Scenario(int scenarioNumber, double expenses, String taxSetting,
