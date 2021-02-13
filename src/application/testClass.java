@@ -28,10 +28,11 @@ public class testClass {
 //		double paymentPerTerm = Double.parseDouble((input.nextLine()));
 //		Scenario savingScenario = new Scenario(generateScenarioNumber(), initialCapital, rateOfReturn, taxSetting);
 		try {
-			data.addScenario(200000, "SE", 300000.33, "First Scenario", 5151);
-			data.editScenario(1, 32000, "DK", 25, "First Scene", 15456);
-			data.editScenarioAmountOfTerms(1, 30.333);
-			data.editScenarioPaymentPerTerm(1, 9879);
+//			data.addScenario(200000, "SE", 300000.33, "First Scenario", 5151);
+//			data.editScenario(1, 32000, "DK", 25, "First Scene", 15456);
+//			data.editScenarioAmountOfTerms(1, 30.333);
+//			data.editScenarioPaymentPerTerm(1, 9879);
+			data.unlinkAssetFromScenario("Buick", 3, "Expected Asset");
 //			data.addExpectedAssetClass("Dogecoin", 0.234, 1);
 //			data.addInitialAssetClass("Dogecoin", 0.45, 1);
 //			data.editAssetClass("Bitcoin", "Initial Asset", 0.15, 0.8);
@@ -46,10 +47,7 @@ public class testClass {
 //		answer = input.nextLine();
 //		} while (answer.equalsIgnoreCase("y"));
 //		System.out.println("The program has shut down.");
- catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 	}
 
 }
