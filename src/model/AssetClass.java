@@ -9,6 +9,13 @@ import javafx.beans.property.StringProperty;
 public class AssetClass {
 	private StringProperty assetClassName;
 	private DoubleProperty rateOfReturn;
+	private static DataAccessLayer data = new DataAccessLayer();
+	public DataAccessLayer getData() {
+		return data;
+	}
+	public void setData(DataAccessLayer data) {
+		AssetClass.data = data;
+	}
 	public final StringProperty assetClassNameProperty() {
 		return this.assetClassName;
 	}
@@ -43,7 +50,8 @@ public class AssetClass {
 		return this.getAssetClassName();
 	}
 	public AssetClass fromString(String string) {
-		return new AssetClass(string);
+		
+		return data.getAssetClass(string);
 	}
 
 	

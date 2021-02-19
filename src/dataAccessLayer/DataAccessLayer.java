@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import model.AssetClass;
+
 public class DataAccessLayer {
 	private Connection con;
 	public Connection getCon() {
@@ -36,6 +38,24 @@ public class DataAccessLayer {
 			con = DriverManager.getConnection(url, user, password);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	public Connection getConnection() {
+		//Creating null Connection which will be assigned a value in try/catch block (if successful)
+		try {
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			//Connecting to my local database
+			String url = "jdbc:sqlserver://localhost:1433;database=SmartSavers";
+			
+			//credentials
+			String user = "user";
+			String password = "losen";
+			
+			//Assigning the null variable the value of the (hopefully) successful login
+			return DriverManager.getConnection(url, user, password);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 	/********************
@@ -231,6 +251,20 @@ public class DataAccessLayer {
 		
 	}
 	/********************
+	 * Function			editAssetClassName
+	 * Description		Method to edit an asset class. Missing parts, see the above method.
+	 * Parameters 		String assetClassName, String assetClassType, double rateOfReturn, double allocation
+	 * Returns			
+	 * @throws SQLException 
+	 ********************/
+	public void editAssetClassName(String assetClassName, String newAssetClassName) throws SQLException {
+		String query = "UPDATE AssetClass "
+				+ "SET assetClassName = '" + newAssetClassName
+				+ "' WHERE assetClassName = '" + assetClassName + "'";
+		this.update(query);
+		
+	}
+	/********************
 	 * Function			deleteAssetClass
 	 * Description		Method to delete an asset class.
 	 * Parameters 		String assetClassName, String assetClassType
@@ -335,6 +369,141 @@ public class DataAccessLayer {
 			ex.printStackTrace(System.err);
 		}
 	}
+	
+	/********************
+	 * Function			updateScenarioDoubleData
+	 * Description		Method to update a column in a Scenario row with a double type value.
+	 * Parameters 		String column, Double value, int scenarioNumber
+	 * Returns			
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 *
+	 * UPDATE Allocation
+	 * SET allocation = 54
+	 * WHERE assetClassName = 'Gold'
+	 * AND scenarioNumber = 3
+	 * AND allocationType = 'Expected Asset';
+	 * 
+	 *******************/
+	public void editAllocationRate(int scenarioNumber, String assetClassName, String allocationType, double allocation) {
+		String sql = "UPDATE Allocation SET allocation = ? " +
+				"WHERE assetClassName = ? " + 
+				"AND scenarioNumber = ? " + 
+				"AND allocationType = ? ";
+		connect();
+		try (
+				PreparedStatement stmt = con.prepareStatement(sql);
+				) {
+			stmt.setDouble(1, allocation);
+			stmt.setString(2, assetClassName);
+			stmt.setInt(3, scenarioNumber);
+			stmt.setString(4, allocationType);
+			stmt.executeUpdate();
+			
+			closeConnection();
+		} catch (SQLException ex) {
+			System.err.println("Error");
+			// if anything goes wrong, you will need the stack trace:
+			ex.printStackTrace(System.err);
+		}
+	}
+	/**
+	 * @throws SQLException ******
+	 * 
+	 */
+	public void unlinkAssetFromScenario(String assetClassName, int scenarioNumber, String allocationType) throws SQLException {
+		String deleteSQL = "DELETE FROM Allocation " + 
+				"WHERE assetClassName = ? " + 
+				"AND scenarioNumber = ? " + 
+				"AND allocationType = ? ";
+		try (Connection connection = getConnection();
+				PreparedStatement preparedStatement = connection
+						.prepareStatement(deleteSQL)) {
+ 
+			preparedStatement.setString(1, assetClassName);
+			preparedStatement.setInt(2, scenarioNumber);
+			preparedStatement.setString(3, allocationType);
+ 
+			int rowCount = preparedStatement.executeUpdate();
+ 
+			System.out
+					.println("Record Deleted successfully from database. Row Count returned is :: "
+							+ rowCount);
+ 
+		} catch (SQLException e) {
+			System.out
+					.println("An exception occured while deleting data from database. Exception is :: "
+							+ e);
+		}
+		
+	}
+	public void clearInitialAllocationsFromScenario(int scenarioNumber) {
+		clearAllocationsFromScenario(scenarioNumber, "Initial Asset");
+	}
+	public void clearExpectedAllocationsFromScenario(int scenarioNumber) {
+		clearAllocationsFromScenario(scenarioNumber, "Expected Asset");
+	}
+
+	public void clearAllocationsFromScenario(int scenarioNumber, String allocationType) {
+		String deleteSQL = "DELETE FROM Allocation " + 
+				"WHERE scenarioNumber = ? " + 
+				"AND allocationType = ? ";
+		try (Connection connection = getConnection();
+				PreparedStatement preparedStatement = connection
+						.prepareStatement(deleteSQL)) {
+ 
+			preparedStatement.setInt(1, scenarioNumber);
+			preparedStatement.setString(2, allocationType);
+ 
+			int rowCount = preparedStatement.executeUpdate();
+ 
+			System.out
+					.println("Record Deleted successfully from database. Row Count returned is :: "
+							+ rowCount);
+ 
+		} catch (SQLException e) {
+			System.out
+					.println("An exception occured while deleting data from database. Exception is :: "
+							+ e);
+		}
+	}
+	public double findRateOfReturnForAsset(String assetClassName) {
+			 
+			String selectSql = "SELECT rateOfReturn FROM AssetClass WHERE assetClassName = ? ";
+			double rateOfReturn = 0;
+	 
+			try (Connection connection = getConnection();
+					PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+				preparedStatement.setString(1, assetClassName);
+				ResultSet rs = preparedStatement.executeQuery();
+				if (rs.next()) {
+					rateOfReturn = rs.getDouble("rateOfReturn");
+				}
+			} catch (SQLException e) {
+				System.out.println("An exception occured while Selecting records from Table. Exception is :: "	+ e);
+			}
+			return rateOfReturn;
+	}
+	public AssetClass getAssetClass(String assetClassName) {
+		String selectSql = "SELECT * FROM AssetClass WHERE assetClassName = ? ";
+		AssetClass assetClass = null;
+ 
+		try (Connection connection = getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			preparedStatement.setString(1, assetClassName);
+			ResultSet rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				double rateOfReturn = rs.getDouble("rateOfReturn");
+				
+				assetClass = new AssetClass(assetClassName, rateOfReturn);
+			}
+		} catch (SQLException e) {
+			System.out.println("An exception occured while Selecting records from Table. Exception is :: "	+ e);
+		}
+		return assetClass;
+	}
+	
+	
 
 	
 }

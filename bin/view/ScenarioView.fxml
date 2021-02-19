@@ -21,19 +21,20 @@
                         <Font size="24.0" />
                      </font>
                   </Label>
-                  <ComboBox fx:id="initialAssetNameBox" layoutX="7.0" layoutY="303.0" onAction="#initialAssetSelected" prefHeight="25.0" prefWidth="118.0" />
+                  <ComboBox fx:id="initialAssetNameBox" editable="true" layoutX="7.0" layoutY="303.0" onAction="#initialAssetSelected" prefHeight="25.0" prefWidth="118.0" />
                   <TextField fx:id="initialAssetRateOfReturnField" layoutX="132.0" layoutY="303.0" prefHeight="25.0" prefWidth="98.0" promptText="Rate of return" AnchorPane.bottomAnchor="72.0" />
                   <TextField fx:id="initialAssetAllocationField" layoutX="253.0" layoutY="303.0" prefHeight="25.0" prefWidth="94.0" promptText="Allocation" AnchorPane.bottomAnchor="72.0" />
                   <Button fx:id="addInitialAllocationButton" layoutX="378.0" layoutY="290.0" mnemonicParsing="false" onAction="#addInitialAllocation" text="Add" AnchorPane.bottomAnchor="72.0" AnchorPane.rightAnchor="35.0" />
                   <Button fx:id="deleteInitialAllocationButton" layoutX="364.0" layoutY="335.0" mnemonicParsing="false" onAction="#deleteInitialAllocation" text="Delete" AnchorPane.rightAnchor="35.0" />
                   <Button fx:id="clearInitialAllocationsButton" layoutX="375.0" layoutY="368.0" mnemonicParsing="false" onAction="#clearInitialAllocations" text="Clear" AnchorPane.rightAnchor="35.0" />
-                  <TableView fx:id="initialAllocationTable" layoutX="-29.0" layoutY="65.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="239.0" prefWidth="340.0" AnchorPane.bottomAnchor="106.0" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="55.0">
+                  <TableView fx:id="initialAllocationTable" editable="true" layoutX="-29.0" layoutY="65.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="239.0" prefWidth="340.0" AnchorPane.bottomAnchor="106.0" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="55.0">
                      <columns>
                         <TableColumn fx:id="initialAllocationNameColumn" prefWidth="122.0" text="Name" />
                         <TableColumn fx:id="initialAllocationRateOfReturnColumn" prefWidth="113.0" text="Rate of return (%)" />
                         <TableColumn fx:id="initialAllocationColumn" prefWidth="104.0" text="Allocation (%)" />
                      </columns>
                   </TableView>
+                  <Label fx:id="initialAllocationFeedback" layoutY="360.0" />
                </children>
             </AnchorPane>
          </left>
@@ -71,7 +72,7 @@
                         <Font size="24.0" />
                      </font>
                   </Label>
-                  <ComboBox fx:id="expectedAssetNameBox" layoutX="7.0" layoutY="305.0" onAction="#expectedAssetSelected" prefHeight="25.0" prefWidth="118.0" />
+                  <ComboBox fx:id="expectedAssetNameBox" editable="true" layoutX="7.0" layoutY="305.0" onAction="#expectedAssetSelected" prefHeight="25.0" prefWidth="118.0" />
                   <TextField fx:id="expectedAssetRateOfReturnField" layoutX="132.0" layoutY="305.0" prefHeight="25.0" prefWidth="98.0" promptText="Rate of return" AnchorPane.bottomAnchor="72.0" />
                   <TextField fx:id="expectedAssetAllocationField" layoutX="253.0" layoutY="305.0" prefHeight="25.0" prefWidth="94.0" promptText="Allocation" AnchorPane.bottomAnchor="72.0" />
                   <Button fx:id="addExpectedAllocationButton" layoutX="378.0" layoutY="294.0" mnemonicParsing="false" onAction="#addExpectedAllocation" text="Add" AnchorPane.bottomAnchor="72.0" AnchorPane.rightAnchor="34.0" />
@@ -85,6 +86,7 @@
                         <TableColumn fx:id="expectedAllocationColumn" prefWidth="104.0" text="Allocation (%)" />
                      </columns>
                   </TableView>
+                  <Label fx:id="expectedAllocationFeedback" layoutY="360.0" />
                </children>
             </AnchorPane>
          </right>
