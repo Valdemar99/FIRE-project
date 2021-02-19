@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import model.AssetClass;
+
 public class DataAccessLayer {
 	private Connection con;
 	public Connection getCon() {
@@ -481,6 +483,24 @@ public class DataAccessLayer {
 				System.out.println("An exception occured while Selecting records from Table. Exception is :: "	+ e);
 			}
 			return rateOfReturn;
+	}
+	public AssetClass getAssetClass(String assetClassName) {
+		String selectSql = "SELECT * FROM AssetClass WHERE assetClassName = ? ";
+		AssetClass assetClass = null;
+ 
+		try (Connection connection = getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			preparedStatement.setString(1, assetClassName);
+			ResultSet rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				double rateOfReturn = rs.getDouble("rateOfReturn");
+				
+				assetClass = new AssetClass(assetClassName, rateOfReturn);
+			}
+		} catch (SQLException e) {
+			System.out.println("An exception occured while Selecting records from Table. Exception is :: "	+ e);
+		}
+		return assetClass;
 	}
 	
 	

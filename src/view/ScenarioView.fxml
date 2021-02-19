@@ -21,7 +21,7 @@
                         <Font size="24.0" />
                      </font>
                   </Label>
-                  <ComboBox fx:id="initialAssetNameBox" editable="true" layoutX="7.0" layoutY="303.0" onMouseExited="#initialAssetSelected" prefHeight="25.0" prefWidth="118.0" />
+                  <ComboBox fx:id="initialAssetNameBox" editable="true" layoutX="7.0" layoutY="303.0" onAction="#initialAssetSelected" prefHeight="25.0" prefWidth="118.0" />
                   <TextField fx:id="initialAssetRateOfReturnField" layoutX="132.0" layoutY="303.0" prefHeight="25.0" prefWidth="98.0" promptText="Rate of return" AnchorPane.bottomAnchor="72.0" />
                   <TextField fx:id="initialAssetAllocationField" layoutX="253.0" layoutY="303.0" prefHeight="25.0" prefWidth="94.0" promptText="Allocation" AnchorPane.bottomAnchor="72.0" />
                   <Button fx:id="addInitialAllocationButton" layoutX="378.0" layoutY="290.0" mnemonicParsing="false" onAction="#addInitialAllocation" text="Add" AnchorPane.bottomAnchor="72.0" AnchorPane.rightAnchor="35.0" />
@@ -72,7 +72,7 @@
                         <Font size="24.0" />
                      </font>
                   </Label>
-                  <ComboBox fx:id="expectedAssetNameBox" editable="true" layoutX="7.0" layoutY="305.0" onMouseDragExited="#expectedAssetSelected" prefHeight="25.0" prefWidth="118.0" />
+                  <ComboBox fx:id="expectedAssetNameBox" editable="true" layoutX="7.0" layoutY="305.0" onAction="#expectedAssetSelected" prefHeight="25.0" prefWidth="118.0" />
                   <TextField fx:id="expectedAssetRateOfReturnField" layoutX="132.0" layoutY="305.0" prefHeight="25.0" prefWidth="98.0" promptText="Rate of return" AnchorPane.bottomAnchor="72.0" />
                   <TextField fx:id="expectedAssetAllocationField" layoutX="253.0" layoutY="305.0" prefHeight="25.0" prefWidth="94.0" promptText="Allocation" AnchorPane.bottomAnchor="72.0" />
                   <Button fx:id="addExpectedAllocationButton" layoutX="378.0" layoutY="294.0" mnemonicParsing="false" onAction="#addExpectedAllocation" text="Add" AnchorPane.bottomAnchor="72.0" AnchorPane.rightAnchor="34.0" />
