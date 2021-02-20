@@ -6,7 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import model.Allocation;
+import model.Allocation.AllocationTypeTypeEnum;
 import model.AssetClass;
+import model.AssetClassAllocationWrapper;
+import model.Scenario;
 
 public class DataAccessLayer {
 	private Connection con;
@@ -196,11 +202,32 @@ public class DataAccessLayer {
 	 * @throws ClassNotFoundException 
 	 * @throws SQLException 
 	 ********************/
-	public ResultSet getScenarios() throws ClassNotFoundException, SQLException {
-		String query = "SELECT * FROM Scenario";
-		ResultSet scenarios = this.query(query);
+	public ObservableList<Scenario> getScenarios() throws ClassNotFoundException, SQLException {
+		String selectSql = "SELECT * FROM Scenario";
 		
-		return scenarios;
+		ObservableList<Scenario> scenarioList = FXCollections.observableArrayList();
+		try (Connection connection = getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			ResultSet scenarioSet = preparedStatement.executeQuery();
+			while (scenarioSet.next()) {
+				String scenarioName = scenarioSet.getString("scenarioName");
+				int scenarioNumber = scenarioSet.getInt("scenarioNumber");
+				double expenses = scenarioSet.getDouble("expenses");
+				double initialCapital = scenarioSet.getDouble("initialCapital");
+				double capitalGoal = scenarioSet.getDouble("capitalGoal");
+				String taxSetting = scenarioSet.getString("taxSetting");
+				double amountOfTerms = scenarioSet.getDouble("amountOfTerms");
+				double paymentPerTerm = scenarioSet.getDouble("paymentPerTerm");
+				
+				Scenario thisRow = new Scenario(scenarioNumber, scenarioName, taxSetting,
+						expenses, initialCapital, capitalGoal, amountOfTerms, paymentPerTerm);
+				scenarioList.add(thisRow);
+			}
+		} catch (SQLException e) {
+			System.out.println("An exception occured while Selecting records from Table. Exception is :: "	+ e);
+		}
+		return scenarioList;
+
 	}
 	//Here are the methods for asset classes:
 	/********************
@@ -313,6 +340,36 @@ public class DataAccessLayer {
 		return assetClasses;
 	}
 	
+	public ObservableList<AssetClassAllocationWrapper> getInitialAssetClassList(int scenarioNumber){
+		String selectSql = "SELECT Allocation.assetClassName, Allocation.allocation, AssetClass.rateOfReturn " + 
+				"FROM Allocation " + 
+				"INNER JOIN AssetClass ON AssetClass.assetClassName = Allocation.assetClassName " + 
+				"WHERE Allocation.scenarioNumber = ? " +  
+				" AND Allocation.allocationType = 'Initial Asset';";
+		
+		ObservableList<AssetClassAllocationWrapper> allocationList = FXCollections.observableArrayList();
+		try (Connection connection = getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			preparedStatement.setInt(1, scenarioNumber);
+			ResultSet initialAssetSet = preparedStatement.executeQuery();
+			while (initialAssetSet.next()) {
+				String assetClassName = initialAssetSet.getString("assetClassName");
+				double rateOfReturn = initialAssetSet.getDouble("rateOfReturn");
+				double allocationRate = initialAssetSet.getDouble("allocation");
+
+				AssetClass assetClass = new AssetClass(assetClassName, rateOfReturn);
+				Allocation allocation = new Allocation(allocationRate, AllocationTypeTypeEnum.INITIAL_ASSET, scenarioNumber, assetClassName);
+				
+				AssetClassAllocationWrapper thisRow = new AssetClassAllocationWrapper(assetClass, allocation);
+				allocationList.add(thisRow);
+			}
+		} catch (SQLException e) {
+			System.out.println("An exception occured while Selecting records from Table. Exception is :: "	+ e);
+		}
+		return allocationList;
+
+	}
+	
 	/********************
 	 * Function			getExpectedAssetClasses
 	 * Description		Method to retrieve all expected asset classes for a scenario.
@@ -332,6 +389,37 @@ public class DataAccessLayer {
 		
 		return assetClasses;
 	}
+	
+	public ObservableList<AssetClassAllocationWrapper> getExpectedAssetClassList(int scenarioNumber){
+		String selectSql = "SELECT Allocation.assetClassName, Allocation.allocation, AssetClass.rateOfReturn " + 
+				"FROM Allocation " + 
+				"INNER JOIN AssetClass ON AssetClass.assetClassName = Allocation.assetClassName " + 
+				"WHERE Allocation.scenarioNumber = ? " +  
+				" AND Allocation.allocationType = 'Expected Asset';";
+		
+		ObservableList<AssetClassAllocationWrapper> allocationList = FXCollections.observableArrayList();
+		try (Connection connection = getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			preparedStatement.setInt(1, scenarioNumber);
+			ResultSet initialAssetSet = preparedStatement.executeQuery();
+			while (initialAssetSet.next()) {
+				String assetClassName = initialAssetSet.getString("assetClassName");
+				double rateOfReturn = initialAssetSet.getDouble("rateOfReturn");
+				double allocationRate = initialAssetSet.getDouble("allocation");
+
+				AssetClass assetClass = new AssetClass(assetClassName, rateOfReturn);
+				Allocation allocation = new Allocation(allocationRate, AllocationTypeTypeEnum.EXPECTED_ASSET, scenarioNumber, assetClassName);
+				
+				AssetClassAllocationWrapper thisRow = new AssetClassAllocationWrapper(assetClass, allocation);
+				allocationList.add(thisRow);
+			}
+		} catch (SQLException e) {
+			System.out.println("An exception occured while Selecting records from Table. Exception is :: "	+ e);
+		}
+		return allocationList;
+
+	}
+	
 	/********************
 	 * Function			updateScenarioDoubleData
 	 * Description		Method to update a column in a Scenario row with a double type value.

@@ -1,5 +1,5 @@
-/application/
-/controller/
-/model/
 /dataAccessLayer/
+/model/
+/controller/
 /view/
+/application/

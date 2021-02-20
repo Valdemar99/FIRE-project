@@ -3,6 +3,8 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 
 import dataAccessLayer.DataAccessLayer;
+import javafx.collections.ObservableList;
+import model.Scenario;
 
 public class testClass {
 	public static int generateScenarioNumber() {
@@ -32,7 +34,17 @@ public class testClass {
 //			data.editScenario(1, 32000, "DK", 25, "First Scene", 15456);
 //			data.editScenarioAmountOfTerms(1, 30.333);
 //			data.editScenarioPaymentPerTerm(1, 9879);
-			data.unlinkAssetFromScenario("Buick", 3, "Expected Asset");
+			ObservableList<Scenario> set = data.getScenarios();
+			Scenario scenario = set.get(2);
+    		double amountOfYears = 23;
+    		double annualPayment = 90000;
+			scenario.setAmountOfTerms(amountOfYears);
+			scenario.setPaymentPerTerm(annualPayment);
+			
+			data.updateScenarioDoubleData("amountOfTerms", amountOfYears, scenario.getScenarioNumber());
+			data.updateScenarioDoubleData("paymentPerTerm", annualPayment, scenario.getScenarioNumber());
+			double finalCapital = scenario.calculateFinalCapital();
+			System.out.println("Final capital " + String.format("%, .2f", finalCapital));
 //			data.addExpectedAssetClass("Dogecoin", 0.234, 1);
 //			data.addInitialAssetClass("Dogecoin", 0.45, 1);
 //			data.editAssetClass("Bitcoin", "Initial Asset", 0.15, 0.8);
@@ -47,6 +59,10 @@ public class testClass {
 //		answer = input.nextLine();
 //		} while (answer.equalsIgnoreCase("y"));
 //		System.out.println("The program has shut down.");
+ catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

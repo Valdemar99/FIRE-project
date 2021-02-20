@@ -116,6 +116,9 @@ public class Controller implements Initializable {
 	@FXML 
 	private Button calculateYearlyPaymentButton;
 
+	@FXML
+	private Button calculateButton;
+
 	@FXML 
 	private Label feedbackLabel;
 
@@ -157,10 +160,37 @@ public class Controller implements Initializable {
 	
 	@FXML
 	private TextField capitalGoalField;
+	
+    @FXML
+    private TextField annualPaymentField;
 
+    @FXML
+    private TextField amountOfYearsField;
+
+    @FXML 
+	void handleCalculateButton(ActionEvent event) {
+    	Scenario scenario;
+    	if (!scenarioTable.getSelectionModel().isEmpty()) {
+			scenario = scenarioTable.getSelectionModel().getSelectedItem();
+    		double amountOfYears = Double.parseDouble(amountOfYearsField.getText());
+    		double annualPayment = Double.parseDouble(annualPaymentField.getText());
+			scenario.setAmountOfTerms(amountOfYears);
+			scenario.setPaymentPerTerm(annualPayment);
+			
+			data.updateScenarioDoubleData("amountOfTerms", amountOfYears, scenario.getScenarioNumber());
+			data.updateScenarioDoubleData("paymentPerTerm", annualPayment, scenario.getScenarioNumber());
+			double finalCapital = scenario.calculateFinalCapital();
+			feedbackLabel.setText("Final capital: " + String.format("%, .2f", finalCapital));
+
+
+		} else {
+			feedbackLabel.setText("Please select a scenario.");
+		}
+    }
+    
 	@FXML 
 	void handleCalculateAmountOfYearsButton(ActionEvent event) {
-
+		
 	}
 
 	@FXML 
@@ -297,23 +327,11 @@ public class Controller implements Initializable {
 	 ********************/
 	public void getScenarios(){
 		try {
-			ResultSet scenarioSet = data.getScenarios();
-			while (scenarioSet.next()) {
-				String scenarioName = scenarioSet.getString("scenarioName");
-				int scenarioNumber = scenarioSet.getInt("scenarioNumber");
-				double expenses = scenarioSet.getDouble("expenses");
-				double initialCapital = scenarioSet.getDouble("initialCapital");
-				double capitalGoal = scenarioSet.getDouble("capitalGoal");
-				String taxSetting = scenarioSet.getString("taxSetting");
-				
-
-				Scenario thisRow = new Scenario(scenarioNumber, scenarioName, taxSetting,
-						expenses, initialCapital, capitalGoal);
-				scenarioList.add(thisRow);
-			}
-			data.closeConnection();
-
-		} catch (ClassNotFoundException | SQLException e) {
+			this.scenarioList = data.getScenarios();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -83,6 +83,9 @@
                </font>
             </Label>
             <Label fx:id="feedbackLabel" layoutX="23.0" layoutY="560.0" />
+            <TextField fx:id="annualPaymentField" layoutX="23.0" layoutY="365.0" promptText="Annual payment" />
+            <TextField fx:id="amountOfYearsField" layoutX="23.0" layoutY="406.0" promptText="Amount of years" />
+            <Button fx:id="calculateButton" layoutX="22.0" layoutY="450.0" mnemonicParsing="false" onAction="#handleCalculateButton" text="Calculate" />
          </children>
       </Pane>
    </right>
