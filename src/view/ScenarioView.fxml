@@ -84,7 +84,7 @@
                   <Button fx:id="addExpectedAllocationButton" layoutX="378.0" layoutY="294.0" mnemonicParsing="false" onAction="#addExpectedAllocation" text="Add" AnchorPane.bottomAnchor="72.0" AnchorPane.rightAnchor="34.0" />
                   <Button fx:id="clearExpectedAllocationsButton" layoutX="375.0" layoutY="368.0" mnemonicParsing="false" onAction="#clearExpectedAllocations" text="Clear" AnchorPane.rightAnchor="32.0" />
                   <Button fx:id="goBackButton" layoutX="360.0" layoutY="227.0" mnemonicParsing="false" onAction="#goBack" text="Go back" />
-                  <TableView fx:id="expectedAllocationTable" layoutX="-29.0" layoutY="65.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="239.0" prefWidth="340.0" AnchorPane.bottomAnchor="108.0" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="55.0">
+                  <TableView fx:id="expectedAllocationTable" editable="true" layoutX="-29.0" layoutY="65.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="239.0" prefWidth="340.0" AnchorPane.bottomAnchor="108.0" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="55.0">
                      <columns>
                         <TableColumn fx:id="expectedAllocationNameColumn" prefWidth="122.0" text="Name" />
                         <TableColumn fx:id="expectedAllocationRateOfReturnColumn" prefWidth="113.0" text="Rate of return (%)" />

@@ -282,6 +282,7 @@ public class ScenarioController implements Initializable {
 
     public void clearExpectedAllocationSelection() {
 		expectedAssetNameBox.getSelectionModel().clearSelection();
+		expectedAssetNameBox.getEditor().clear();
 		expectedAssetRateOfReturnField.clear();
 		expectedAssetAllocationField.clear();
     }
@@ -321,8 +322,9 @@ public class ScenarioController implements Initializable {
     
     public void clearInitialAllocationSelection() {
     	initialAssetNameBox.getSelectionModel().clearSelection();
-		initialAssetRateOfReturnField.clear();
-		initialAssetAllocationField.clear();
+    	expectedAssetNameBox.getEditor().clear();
+    	initialAssetRateOfReturnField.clear();
+    	initialAssetAllocationField.clear();
     }
 
     @FXML  
@@ -348,8 +350,8 @@ public class ScenarioController implements Initializable {
     @FXML  
     void deleteExpectedAllocation(ActionEvent event) {
     	AssetClassAllocationWrapper allocation;
-		if (!initialAllocationTable.getSelectionModel().isEmpty()) {
-			allocation = initialAllocationTable.getSelectionModel().getSelectedItem();
+		if (!expectedAllocationTable.getSelectionModel().isEmpty()) {
+			allocation = expectedAllocationTable.getSelectionModel().getSelectedItem();
 			try {
 				data.unlinkAssetFromScenario(allocation.getAssetClassName(), scenario.getScenarioNumber(), "Expected Asset");
 				this.updateAllData();
@@ -361,7 +363,7 @@ public class ScenarioController implements Initializable {
 
 
 		} else {
-			expectedAllocationFeedback.setText("Please select a scenario to delete.");
+			expectedAllocationFeedback.setText("Please select an asset to delete.");
 		}
 	}
     
@@ -382,7 +384,7 @@ public class ScenarioController implements Initializable {
 
 
 		} else {
-			initialAllocationFeedback.setText("Please select a scenario to delete.");
+			initialAllocationFeedback.setText("Please select an asset to delete.");
 		}
 	}
 
@@ -582,10 +584,48 @@ public class ScenarioController implements Initializable {
 					updateAllData();
 				});
 	}
+	public void makeExpectedAllocationTableEditable() {
+		//assetClassName
+		expectedAllocationNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+				expectedAllocationNameColumn.setOnEditCommit(event -> {
+					try {
+						data.editAssetClassName(event.getOldValue(), event.getNewValue());
+						this.updateAllData();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				//assetClassRateOfReturn
+				expectedAllocationRateOfReturnColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+				expectedAllocationRateOfReturnColumn.setOnEditCommit(event -> {
+					AssetClassAllocationWrapper allocation = event.getRowValue();
+					allocation.setRateOfReturn(event.getNewValue());
+					
+					allocation.getAssetClass().setRateOfReturn(event.getNewValue());
+					try {
+						data.editAssetClass(allocation.getAssetClassName(), event.getNewValue());
+						this.updateAllData();
+
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				//allocationColumn
+				expectedAllocationColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+				expectedAllocationColumn.setOnEditCommit(event -> {
+					AssetClassAllocationWrapper allocation = event.getRowValue();
+					allocation.setAllocationRate(event.getNewValue());
+					data.editAllocationRate(scenario.getScenarioNumber(), allocation.getAssetClassName(), "Expected Asset", event.getNewValue());
+					updateAllData();
+				});
+	}
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		makeInitialAllocationTableEditable();
+		makeExpectedAllocationTableEditable();
 	}
 	public void updateAllData() {
 		this.clearData();
