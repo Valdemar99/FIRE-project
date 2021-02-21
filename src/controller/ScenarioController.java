@@ -15,12 +15,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 import model.Allocation;
@@ -81,9 +82,6 @@ public class ScenarioController implements Initializable {
     private Button clearInitialAllocationsButton;
 
     @FXML  
-    private Button deleteInitialAllocationButton;
-
-    @FXML  
     private Button addInitialAllocationButton;
 
     @FXML  
@@ -129,8 +127,18 @@ public class ScenarioController implements Initializable {
     @FXML  
     private Button clearExpectedAllocationsButton;
 
-    @FXML  
-    private Button deleteExpectedAllocationButton;
+    
+    @FXML
+    private SplitMenuButton deleteExpectedAllocationButton;
+
+    @FXML
+    private MenuItem deleteExpectedAssetAltogetherMenuItem;
+    
+    @FXML
+    private SplitMenuButton deleteInitialAllocationButton;
+
+    @FXML
+    private MenuItem deleteInitialAssetAltogetherMenuItem;
 
     @FXML  
     private Button addExpectedAllocationButton;
@@ -164,6 +172,80 @@ public class ScenarioController implements Initializable {
     
     @FXML
     private Label initialAllocationFeedback;
+    
+    @FXML
+    void deleteExpectedAssetAltogether(ActionEvent event) {
+    	AssetClassAllocationWrapper allocation;
+    	String assetClassName;
+		assetClassName = expectedAssetNameBox.getValue();
+		if (!expectedAllocationTable.getSelectionModel().isEmpty()) {
+			allocation = expectedAllocationTable.getSelectionModel().getSelectedItem();
+			try {
+				data.deleteAssetClass(allocation.getAssetClassName());
+				this.updateAllData();
+				expectedAllocationFeedback.setText("Executed.");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (!assetClassName.trim().equals("")) {
+			AssetClass assetClassToDelete = data.getAssetClass(assetClassName);
+			if(assetClassToDelete != null) {
+				try {
+					data.deleteAssetClass(assetClassToDelete.getAssetClassName());
+					this.updateAllData();
+					expectedAllocationFeedback.setText("Executed.");
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else {
+				this.expectedAllocationFeedback.setText("The asset does not exist. Please choose another one.");
+			}
+		} else if (assetClassName.trim().equals("")) {
+			this.expectedAllocationFeedback.setText("Please enter a name.");
+		} else {
+			expectedAllocationFeedback.setText("Please select a scenario to delete.");
+		}
+    }
+
+    @FXML
+    void deleteInitialAssetAltogether(ActionEvent event) {
+    	AssetClassAllocationWrapper allocation;
+    	String assetClassName;
+		assetClassName = initialAssetNameBox.getValue();
+		if (!initialAllocationTable.getSelectionModel().isEmpty()) {
+			allocation = initialAllocationTable.getSelectionModel().getSelectedItem();
+			try {
+				data.deleteAssetClass(allocation.getAssetClassName());
+				this.updateAllData();
+				initialAllocationFeedback.setText("Executed.");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (!assetClassName.trim().equals("")) {
+			AssetClass assetClassToDelete = data.getAssetClass(assetClassName);
+			if(assetClassToDelete != null) {
+				try {
+					data.deleteAssetClass(assetClassToDelete.getAssetClassName());
+					this.updateAllData();
+					initialAllocationFeedback.setText("Executed.");
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else {
+				this.expectedAllocationFeedback.setText("The asset does not exist. Please choose another one.");
+			}
+		} else if (assetClassName.trim().equals("")) {
+			this.expectedAllocationFeedback.setText("Please enter a name.");
+		} else {
+			expectedAllocationFeedback.setText("Please select a scenario to delete.");
+		}
+    }
 
     @FXML  
     void addExpectedAllocation(ActionEvent event) {
